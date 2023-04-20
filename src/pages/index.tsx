@@ -1,14 +1,28 @@
-import { SignInButton, useUser } from "@clerk/nextjs";
+import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 
 import { api } from "~/utils/api";
 
-const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+const Feed = () => {
+  const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
-  const { isSignedIn } = useUser();
+  if (postsLoading) return <div>Loading...</div>;
+  if (!data) return <div>Something went wrong</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data?.map((fullPost) => fullPost.content)}
+    </div>
+  );
+};
+
+const Home: NextPage = () => {
+  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
+
+  const { isSignedIn, user } = useUser();
+  console.log(user);
 
   return (
     <>
@@ -19,12 +33,18 @@ const Home: NextPage = () => {
       </Head>
       <main>
         {!isSignedIn && (
-          <div>
-            <h1>Not authenticated</h1>
-            <SignInButton />
+          <div className="flex flex-col content-center items-center justify-center">
+            <h1 className="m-8 text-2xl">Not authenticated</h1>
+            <SignIn />
           </div>
         )}
-        {isSignedIn && <h1>Authenticated!</h1>}
+        {isSignedIn && (
+          <div className="flex flex-col content-center items-center justify-center">
+            <h1 className="m-8 text-2xl">Authenticated!</h1>
+            <Feed />
+            <SignOutButton />
+          </div>
+        )}
       </main>
     </>
   );
