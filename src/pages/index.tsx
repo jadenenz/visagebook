@@ -2,8 +2,9 @@ import { SignIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-
 import { api } from "~/utils/api";
+
+import { PostView } from "~/components/PostView";
 
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
@@ -13,7 +14,9 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {data?.map((fullPost) => fullPost.content)}
+      {data?.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
     </div>
   );
 };
