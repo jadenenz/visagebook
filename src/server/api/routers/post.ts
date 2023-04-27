@@ -3,7 +3,11 @@ import { type Post } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  publicProcedure,
+  privateProcedure,
+} from "~/server/api/trpc";
 
 import type { User } from "@clerk/nextjs/dist/api";
 const filterUserForClient = (user: User) => {
@@ -52,4 +56,21 @@ export const postRouter = createTRPCRouter({
     });
     return addUserDataToPosts(posts);
   }),
+
+  create: privateProcedure
+    .input(
+      z.object({
+        content: z.string().min(1).max(400),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorId = ctx.userId;
+      const post = await ctx.prisma.post.create({
+        data: {
+          authorId,
+          content: input.content,
+        },
+      });
+      return post;
+    }),
 });

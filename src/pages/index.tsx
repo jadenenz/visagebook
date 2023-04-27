@@ -3,8 +3,63 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { api } from "~/utils/api";
+import Image from "next/image";
 
 import { PostView } from "~/components/PostView";
+import { useState } from "react";
+
+const CreatePostWizard = () => {
+  const { user } = useUser();
+
+  const [input, setInput] = useState("");
+
+  const ctx = api.useContext();
+
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.posts.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      console.log(errorMessage);
+      //add toast
+    },
+  });
+
+  if (!user) return null;
+
+  return (
+    <div className="mb-14 flex max-w-2xl items-center justify-center gap-3 bg-white p-4">
+      <Image
+        src={user.profileImageUrl}
+        alt="profile"
+        className="h-14 w-14 rounded-full"
+        height={56}
+        width={56}
+      />
+      <input
+        placeholder="What's on your mind?"
+        className="grow bg-transparent outline-none"
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") {
+              mutate({ content: input });
+            }
+          }
+        }}
+        disabled={isPosting}
+      />
+      {input !== "" && !isPosting && (
+        <button onClick={() => mutate({ content: input })}>Post</button>
+      )}
+    </div>
+  );
+};
 
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
@@ -43,7 +98,7 @@ const Home: NextPage = () => {
         )}
         {isSignedIn && (
           <div className="flex flex-col content-center items-center justify-center">
-            <h1 className="m-8 text-2xl">Authenticated!</h1>
+            <CreatePostWizard />
             <Feed />
             <SignOutButton />
           </div>

@@ -25,7 +25,7 @@ export const PostView = (props: PostWithUser) => {
           </div>
         </div>
       </div>
-      <div className="bg-red-300">{post.content}</div>
+      <div className="">{post.content}</div>
       <div className="flex w-full flex-col">
         <div className="divider"></div>
         <div className="flex justify-between">
