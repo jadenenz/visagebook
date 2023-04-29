@@ -8,6 +8,33 @@ import Image from "next/image";
 import { PostView } from "~/components/PostView";
 import { useState } from "react";
 
+const FriendRequestWindow = () => {
+  const { user } = useUser();
+
+  const { data } = api.relations.getAll.useQuery();
+  console.log("relation data: ", data);
+
+  const friendRequests = data?.map((relation) => {
+    if (relation.relatedUser === user?.id) {
+      return (
+        <div key={relation.id}>
+          {relation.relatingUser} wants to be your friend
+        </div>
+      );
+    }
+  });
+
+  if (!user) return null;
+
+  return (
+    <div className="border">
+      <h1>Your friend requests: </h1>
+      <br />
+      <div>{friendRequests}</div>
+    </div>
+  );
+};
+
 const CreatePostWizard = () => {
   const { user } = useUser();
 
@@ -98,6 +125,7 @@ const Home: NextPage = () => {
         )}
         {isSignedIn && (
           <div className="flex flex-col content-center items-center justify-center">
+            <FriendRequestWindow />
             <CreatePostWizard />
             <Feed />
             <SignOutButton />

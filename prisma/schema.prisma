@@ -17,3 +17,10 @@ model Post {
     content String 
     authorId String
 }
+
+model User_Relationship {
+  id String @id @default(cuid())
+  relatingUser String 
+  relatedUser String 
+  type String
+}
