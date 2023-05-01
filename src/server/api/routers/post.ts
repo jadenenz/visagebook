@@ -30,7 +30,6 @@ const addUserDataToPosts = async (posts: Post[]) => {
 
   return posts.map((post) => {
     const author = users.find((user) => user.id === post.authorId);
-    console.log("author is: ", author);
 
     if (!author || !author.fullName)
       throw new TRPCError({

@@ -8,19 +8,43 @@ import Image from "next/image";
 import { PostView } from "~/components/PostView";
 import { useState } from "react";
 
+type RelatingUser = {
+  id: string;
+  fullName: string;
+  profileImageUrl: string;
+};
+const FriendRequest = (props: RelatingUser) => {
+  const { fullName, profileImageUrl } = props;
+
+  return (
+    <div className="flex">
+      <div>
+        <Image
+          className="mx-4 my-2 rounded-full"
+          alt={`${fullName}'s profile`}
+          src={profileImageUrl}
+          height={36}
+          width={36}
+        />
+      </div>
+      <div className="flex items-center justify-center text-sm">
+        {fullName} wants to be your friend.
+      </div>
+    </div>
+  );
+};
+
 const FriendRequestWindow = () => {
   const { user } = useUser();
 
   const { data } = api.relations.getAll.useQuery();
   console.log("relation data: ", data);
 
-  const friendRequests = data?.map((relation) => {
-    if (relation.relatedUser === user?.id) {
-      return (
-        <div key={relation.id}>
-          {relation.relatingUser} wants to be your friend
-        </div>
-      );
+  const friendRequests = data?.map((request) => {
+    if (request.relatedUser === user?.id) {
+      if (request.type === "pending") {
+        return <FriendRequest {...request.relatingUser} key={request.id} />;
+      }
     }
   });
 
