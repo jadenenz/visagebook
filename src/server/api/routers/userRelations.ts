@@ -62,6 +62,18 @@ export const userRelationsRouter = createTRPCRouter({
       });
 
       if (!relation) throw new TRPCError({ code: "NOT_FOUND" });
+
+      //Make a new record for the friend pair of the accepted friend request
+      //that mirrors the relatedUser and relatingUser
+      const newFriend = await ctx.prisma.user_Relationship.create({
+        data: {
+          relatingUser: relation.relatedUser,
+          relatedUser: relation.relatingUser,
+          type: "friend",
+        },
+      });
+
+      if (!newFriend) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
     }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
