@@ -47,6 +47,23 @@ const addUserDataToRequest = async (relations: User_Relationship[]) => {
 };
 
 export const userRelationsRouter = createTRPCRouter({
+  updateById: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const relation = await ctx.prisma.user_Relationship.update({
+        where: { id: input.id },
+        data: {
+          type: "friend",
+        },
+      });
+
+      if (!relation) throw new TRPCError({ code: "NOT_FOUND" });
+    }),
+
   getAll: publicProcedure.query(async ({ ctx }) => {
     const relations = await ctx.prisma.user_Relationship.findMany({
       take: 100,

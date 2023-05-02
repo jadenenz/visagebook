@@ -12,9 +12,31 @@ type RelatingUser = {
   id: string;
   fullName: string;
   profileImageUrl: string;
+  relationId: string;
 };
 const FriendRequest = (props: RelatingUser) => {
-  const { fullName, profileImageUrl } = props;
+  const { fullName, profileImageUrl, relationId } = props;
+  console.log("id is : ", relationId);
+
+  const ctx = api.useContext();
+
+  const mutation = api.relations.updateById.useMutation({
+    onSuccess: () => {
+      void ctx.relations.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        console.log(errorMessage[0]);
+      } else {
+        console.log("Failed to update! Please try again later.");
+      }
+    },
+  });
+
+  const handleAccept = () => {
+    mutation.mutate({ id: relationId });
+  };
 
   return (
     <div className="flex">
@@ -29,6 +51,7 @@ const FriendRequest = (props: RelatingUser) => {
       </div>
       <div className="flex items-center justify-center text-sm">
         {fullName} wants to be your friend.
+        <button onClick={handleAccept}>Accept</button>
       </div>
     </div>
   );
@@ -37,13 +60,23 @@ const FriendRequest = (props: RelatingUser) => {
 const FriendRequestWindow = () => {
   const { user } = useUser();
 
-  const { data } = api.relations.getAll.useQuery();
+  const { data, isLoading } = api.relations.getAll.useQuery();
   console.log("relation data: ", data);
+
+  if (!data) return null;
+
+  if (isLoading) return <div>Loading...</div>;
 
   const friendRequests = data?.map((request) => {
     if (request.relatedUser === user?.id) {
       if (request.type === "pending") {
-        return <FriendRequest {...request.relatingUser} key={request.id} />;
+        return (
+          <FriendRequest
+            {...request.relatingUser}
+            relationId={request.id}
+            key={request.id}
+          />
+        );
       }
     }
   });
