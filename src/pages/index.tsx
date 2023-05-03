@@ -7,6 +7,7 @@ import Image from "next/image";
 
 import { PostView } from "~/components/PostView";
 import { useState } from "react";
+import { UsersList } from "~/components/UsersList";
 
 type RelatingUser = {
   id: string;
@@ -182,6 +183,7 @@ const Home: NextPage = () => {
         )}
         {isSignedIn && (
           <div className="flex flex-col content-center items-center justify-center">
+            <UsersList />
             <FriendRequestWindow />
             <CreatePostWizard />
             <Feed />
