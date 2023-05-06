@@ -9,6 +9,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 model Post {
@@ -23,4 +24,6 @@ model User_Relationship {
   relatingUser String 
   relatedUser String 
   type String
+
+  @@unique([relatingUser, relatedUser])
 }

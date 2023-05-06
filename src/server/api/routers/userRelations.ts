@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
+import { string, z } from "zod";
 import { type User_Relationship } from "@prisma/client";
 
 import {
@@ -47,7 +47,38 @@ const addUserDataToRequest = async (relations: User_Relationship[]) => {
 };
 
 export const userRelationsRouter = createTRPCRouter({
-  updateById: publicProcedure
+  requestById: privateProcedure
+    .input(
+      z.object({
+        relatedUserId: string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const relation = await ctx.prisma.user_Relationship.upsert({
+        where: {
+          relatingUser_relatedUser: {
+            relatingUser: ctx.userId,
+            relatedUser: input.relatedUserId,
+          },
+          type: {
+            not: "friend",
+          },
+        },
+        update: { type: "pending" },
+        create: {
+          relatingUser: ctx.userId,
+          relatedUser: input.relatedUserId,
+          type: "pending",
+        },
+      });
+
+      if (!relation)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+        });
+    }),
+
+  acceptById: publicProcedure
     .input(
       z.object({
         id: z.string(),

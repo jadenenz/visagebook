@@ -21,7 +21,7 @@ const FriendRequest = (props: RelatingUser) => {
 
   const ctx = api.useContext();
 
-  const mutation = api.relations.updateById.useMutation({
+  const mutation = api.relations.acceptById.useMutation({
     onSuccess: () => {
       void ctx.relations.getAll.invalidate();
     },
