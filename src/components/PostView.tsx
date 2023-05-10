@@ -1,6 +1,8 @@
 import { type Post } from "@prisma/client";
 import Image from "next/image";
+import { useState } from "react";
 import { type RouterOutputs } from "~/utils/api";
+import { api } from "~/utils/api";
 
 const CommentView = (props: PostWithUser) => {
   const { post } = props;
@@ -34,6 +36,31 @@ type PostWithUser = RouterOutputs["posts"]["getAll"][number];
 // }
 
 export const PostView = (props: PostWithUser) => {
+  const [showCommentInput, setShowCommentInput] = useState(false);
+  const [input, setInput] = useState("");
+  const ctx = api.useContext();
+  const { mutate, isLoading: isPosting } = api.posts.postComment.useMutation({
+    onSuccess: () => {
+      void ctx.posts.getAll.invalidate();
+    },
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        console.log(errorMessage[0]);
+      } else {
+        console.log("Failed to update! Please try again later.");
+      }
+    },
+  });
+
+  const handleSubmitComment = () => {
+    if (input !== "") {
+      mutate({ content: input, postId: post.id });
+    }
+    setInput("");
+    setShowCommentInput(false);
+  };
+
   const { post, author } = props;
   return (
     <div
@@ -61,8 +88,37 @@ export const PostView = (props: PostWithUser) => {
         <div className="divider"></div>
         <div className="flex justify-between">
           <button className="btn-outline btn px-16">Like</button>
-          <button className="btn-outline btn px-16">Comment</button>
+          <button
+            onClick={() => setShowCommentInput(true)}
+            className="btn-outline btn px-16"
+          >
+            Comment
+          </button>
         </div>
+        {showCommentInput && (
+          <div>
+            <input
+              placeholder="Add a comment..."
+              className="grow bg-transparent outline-none"
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (input !== "") {
+                    mutate({ content: input, postId: post.id });
+                    setInput("");
+                    setShowCommentInput(false);
+                  }
+                }
+              }}
+              disabled={isPosting}
+            />
+            <button onClick={() => setShowCommentInput(false)}>Cancel</button>
+            <button onClick={handleSubmitComment}>Submit</button>
+          </div>
+        )}
         <div className="divider"></div>
         <CommentView {...props} />
       </div>
