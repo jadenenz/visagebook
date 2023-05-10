@@ -149,6 +149,8 @@ const CreatePostWizard = () => {
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
+  console.log("post query data: ", data);
+
   if (postsLoading) return <div>Loading...</div>;
   if (!data) return <div>Something went wrong</div>;
 

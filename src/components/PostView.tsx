@@ -1,7 +1,38 @@
+import { type Post } from "@prisma/client";
 import Image from "next/image";
 import { type RouterOutputs } from "~/utils/api";
 
+const CommentView = (props: PostWithUser) => {
+  const { post } = props;
+  const commentsList = post.comments.map((comment) => {
+    if (comment.content === undefined) return null;
+
+    return (
+      <div className="flex items-center justify-center" key={comment.id}>
+        <div>
+          <Image
+            src={comment.commentAuthorData.profileImageUrl}
+            alt={`${comment.commentAuthorData.fullName}'s profile`}
+            className="m-4 rounded-full"
+            height={46}
+            width={46}
+          />
+        </div>
+        <div className="mx-2">{comment.commentAuthorData.fullName}</div>
+        <div>{comment.content}</div>
+      </div>
+    );
+  });
+
+  return <div>{commentsList}</div>;
+};
+
 type PostWithUser = RouterOutputs["posts"]["getAll"][number];
+
+// type PostWithUserAndCommentsWithUser = {
+
+// }
+
 export const PostView = (props: PostWithUser) => {
   const { post, author } = props;
   return (
@@ -32,6 +63,8 @@ export const PostView = (props: PostWithUser) => {
           <button className="btn-outline btn px-16">Like</button>
           <button className="btn-outline btn px-16">Comment</button>
         </div>
+        <div className="divider"></div>
+        <CommentView {...props} />
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ model Post {
     createdAt DateTime @default(now())
     content String 
     authorId String
+    comments Comment[]
 }
 
 model User_Relationship {
@@ -26,4 +27,14 @@ model User_Relationship {
   type String
 
   @@unique([relatingUser, relatedUser])
+}
+
+model Comment {
+id String @id @default(cuid())
+createdAt DateTime @default(now())
+content String
+authorId String
+parentPost Post @relation(fields: [parentPostId], references: [id])
+parentPostId String
+@@index([parentPostId, authorId])
 }

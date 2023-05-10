@@ -1,8 +1,7 @@
 import { clerkClient } from "@clerk/nextjs/server";
-import { type Post } from "@prisma/client";
+import type { Post, Comment } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
 import {
   createTRPCRouter,
   publicProcedure,
@@ -20,7 +19,17 @@ const filterUserForClient = (user: User) => {
   };
 };
 
-const addUserDataToPosts = async (posts: Post[]) => {
+interface CommentWithUserData extends Comment {
+  commentAuthorData: {
+    id: string;
+    fullName: string;
+    profileImageUrl: string;
+  };
+}
+
+type PostWithComments = Post & { comments: Comment[] };
+type PostWithCommentsAndUserData = Post & { comments: CommentWithUserData[] };
+const addUserDataToPosts = async (posts: PostWithComments[]) => {
   const users = (
     await clerkClient.users.getUserList({
       userId: posts.map((post) => post.authorId),
@@ -30,6 +39,21 @@ const addUserDataToPosts = async (posts: Post[]) => {
 
   return posts.map((post) => {
     const author = users.find((user) => user.id === post.authorId);
+    const newComments = post.comments.map((comment) => {
+      const commentAuthor = users.find((user) => user.id === comment.authorId);
+      if (!commentAuthor)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Comment author not found",
+        });
+      const finalComment: CommentWithUserData = {
+        ...comment,
+        commentAuthorData: {
+          ...commentAuthor,
+        },
+      };
+      return finalComment;
+    });
 
     if (!author || !author.fullName)
       throw new TRPCError({
@@ -37,8 +61,13 @@ const addUserDataToPosts = async (posts: Post[]) => {
         message: "Author for post not found",
       });
 
+    const finalPost: PostWithCommentsAndUserData = {
+      ...post,
+      comments: newComments,
+    };
+
     return {
-      post,
+      post: finalPost,
       author: {
         ...author,
         fullName: author.fullName,
@@ -52,6 +81,9 @@ export const postRouter = createTRPCRouter({
     const posts = await ctx.prisma.post.findMany({
       take: 100,
       orderBy: [{ createdAt: "desc" }],
+      include: {
+        comments: true,
+      },
     });
     return addUserDataToPosts(posts);
   }),
@@ -73,3 +105,4 @@ export const postRouter = createTRPCRouter({
       return post;
     }),
 });
+export {};
