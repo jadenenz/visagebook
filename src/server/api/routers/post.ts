@@ -1,12 +1,9 @@
+import { privateProcedure } from "./../trpc";
 import { clerkClient } from "@clerk/nextjs/server";
 import type { Post, Comment } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-  privateProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
 import type { User } from "@clerk/nextjs/dist/api";
 const filterUserForClient = (user: User) => {
@@ -88,6 +85,11 @@ export const postRouter = createTRPCRouter({
     return addUserDataToPosts(posts);
   }),
 
+  getLikedPosts: publicProcedure.query(async ({ ctx }) => {
+    const likedPosts = await ctx.prisma.likedPosts.findMany();
+    return likedPosts;
+  }),
+
   create: privateProcedure
     .input(
       z.object({
@@ -122,6 +124,43 @@ export const postRouter = createTRPCRouter({
         },
       });
       return comment;
+    }),
+
+  likePost: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.userId;
+      const postId = input.postId;
+      const likedPost = await ctx.prisma.likedPosts.create({
+        data: {
+          postId: postId,
+          userId: userId,
+        },
+      });
+      return likedPost;
+    }),
+
+  // NEED TO MAKE UNIQUE QUERY FOR LIKEDPOST
+  unlikePost: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const deletedPost = await ctx.prisma.likedPosts.delete({
+        where: {
+          postId_userId: {
+            postId: input.postId,
+            userId: ctx.userId,
+          },
+        },
+      });
+      return deletedPost;
     }),
 });
 export {};

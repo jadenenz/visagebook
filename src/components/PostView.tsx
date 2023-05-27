@@ -1,6 +1,9 @@
+import { useUser } from "@clerk/nextjs";
 import { type Post } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { getQueryKey } from "@trpc/react-query";
 import Image from "next/image";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { type RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
 
@@ -31,37 +34,106 @@ const CommentView = (props: PostWithUser) => {
 
 type PostWithUser = RouterOutputs["posts"]["getAll"][number];
 
-// type PostWithUserAndCommentsWithUser = {
-
-// }
-
 export const PostView = (props: PostWithUser) => {
+  const { post, author } = props;
+  const { user } = useUser();
   const [showCommentInput, setShowCommentInput] = useState(false);
   const [input, setInput] = useState("");
   const ctx = api.useContext();
-  const { mutate, isLoading: isPosting } = api.posts.postComment.useMutation({
-    onSuccess: () => {
-      void ctx.posts.getAll.invalidate();
-    },
-    onError: (e) => {
-      const errorMessage = e.data?.zodError?.fieldErrors.content;
-      if (errorMessage && errorMessage[0]) {
-        console.log(errorMessage[0]);
-      } else {
-        console.log("Failed to update! Please try again later.");
-      }
-    },
-  });
+  const { data: likedPosts } = api.posts.getLikedPosts.useQuery();
+  const likedPostsQueryKey = getQueryKey(api.posts.getLikedPosts);
+  console.log("queryKey: ", likedPostsQueryKey);
+
+  const postsThatUserHasLiked = likedPosts?.filter(
+    (like) => like.userId === user?.id
+  );
+  const likedPostsThatMatchId = postsThatUserHasLiked?.filter(
+    (like) => like.postId === post.id
+  );
+
+  //mutation for posting comments
+  const { mutate: mutateComment, isLoading: isPosting } =
+    api.posts.postComment.useMutation({
+      onSuccess: () => {
+        void ctx.posts.getAll.invalidate();
+      },
+      onError: (e) => {
+        const errorMessage = e.data?.zodError?.fieldErrors.content;
+        if (errorMessage && errorMessage[0]) {
+          console.log(errorMessage[0]);
+        } else {
+          console.log("Failed to update! Please try again later.");
+        }
+      },
+    });
+
+  //mutation for liking posts
+  const { mutate: mutateLike, isLoading: isLiking } =
+    api.posts.likePost.useMutation({
+      onMutate: async (newLikePostId) => {
+        // Cancel any outgoing refetches
+        // (so they don't overwrite our optimistic update)
+        await ctx.posts.getLikedPosts.cancel();
+        // Snapshot the previous value
+        const previousLikedPosts = ctx.posts.getLikedPosts.getData();
+
+        if (user === undefined || user === null) return;
+
+        const newLike = {
+          id: "banana",
+          postId: newLikePostId.postId,
+          userId: user.id,
+        };
+
+        // Optimistically update to the new value
+        ctx.posts.getLikedPosts.setData(undefined, (old) => {
+          if (old === undefined) {
+            throw new Error("Old data is undefined. This should never happen!");
+          } else {
+            return [...old, newLike];
+          }
+        });
+
+        // Return a context object with the snapshotted value
+        return { previousLikedPosts };
+      },
+      onSuccess: () => {
+        void ctx.posts.getLikedPosts.invalidate();
+      },
+      onError: (e) => {
+        const errorMessage = e.data?.zodError?.fieldErrors.content;
+        if (errorMessage && errorMessage[0]) {
+          console.log(errorMessage[0]);
+        } else {
+          console.log("Failed to update! Please try again later.");
+        }
+      },
+    });
+
+  //mutation for unliking posts
+  const { mutate: mutateUnlike, isLoading: isUnliking } =
+    api.posts.unlikePost.useMutation({
+      onSuccess: () => {
+        void ctx.posts.getLikedPosts.invalidate();
+      },
+      onError: (e) => {
+        const errorMessage = e.data?.zodError?.fieldErrors.content;
+        if (errorMessage && errorMessage[0]) {
+          console.log(errorMessage[0]);
+        } else {
+          console.log("Failed to update! Please try again later.");
+        }
+      },
+    });
 
   const handleSubmitComment = () => {
     if (input !== "") {
-      mutate({ content: input, postId: post.id });
+      mutateComment({ content: input, postId: post.id });
     }
     setInput("");
     setShowCommentInput(false);
   };
 
-  const { post, author } = props;
   return (
     <div
       key={post.id}
@@ -87,7 +159,36 @@ export const PostView = (props: PostWithUser) => {
       <div className="flex w-full flex-col">
         <div className="divider"></div>
         <div className="flex justify-between">
-          <button className="btn-outline btn px-16">Like</button>
+          {/* True if the user has not liked the post */}
+          {likedPostsThatMatchId !== undefined &&
+            likedPostsThatMatchId.length === 0 && (
+              //Renders the liked button if the DB is currently updating the like, else renders like button
+              // (isLiking ? (
+              //   <button
+              //     onClick={() => mutateUnlike({ postId: post.id })}
+              //     className="btn-outline btn px-16 text-red-300"
+              //   >
+              //     Liked
+              //   </button>
+              // ) :
+              <button
+                onClick={() => mutateLike({ postId: post.id })}
+                className="btn-outline btn px-16"
+              >
+                Like
+              </button>
+            )}
+
+          {/* True if the user has liked the post  */}
+          {likedPostsThatMatchId !== undefined &&
+            likedPostsThatMatchId.length > 0 && (
+              <button
+                onClick={() => mutateUnlike({ postId: post.id })}
+                className="btn-outline btn px-16 text-red-300"
+              >
+                Liked
+              </button>
+            )}
           <button
             onClick={() => setShowCommentInput(true)}
             className="btn-outline btn px-16"
@@ -107,7 +208,7 @@ export const PostView = (props: PostWithUser) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   if (input !== "") {
-                    mutate({ content: input, postId: post.id });
+                    mutateComment({ content: input, postId: post.id });
                     setInput("");
                     setShowCommentInput(false);
                   }

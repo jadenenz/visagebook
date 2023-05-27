@@ -38,3 +38,11 @@ parentPost Post @relation(fields: [parentPostId], references: [id])
 parentPostId String
 @@index([parentPostId, authorId])
 }
+
+model LikedPosts {
+id String @id @default(cuid())
+postId String
+userId String
+
+@@unique([postId, userId])
+}
