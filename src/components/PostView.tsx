@@ -42,7 +42,6 @@ export const PostView = (props: PostWithUser) => {
   const ctx = api.useContext();
   const { data: likedPosts } = api.posts.getLikedPosts.useQuery();
   const likedPostsQueryKey = getQueryKey(api.posts.getLikedPosts);
-  console.log("queryKey: ", likedPostsQueryKey);
 
   const postsThatUserHasLiked = likedPosts?.filter(
     (like) => like.userId === user?.id
@@ -113,6 +112,45 @@ export const PostView = (props: PostWithUser) => {
   //mutation for unliking posts
   const { mutate: mutateUnlike, isLoading: isUnliking } =
     api.posts.unlikePost.useMutation({
+      onMutate: async (likedPostId) => {
+        console.log("likedPostId", likedPostId);
+        // Cancel any outgoing refetches
+        // (so they don't overwrite our optimistic update)
+        await ctx.posts.getLikedPosts.cancel();
+        // Snapshot the previous value
+        const previousLikedPosts = ctx.posts.getLikedPosts.getData();
+
+        if (user === undefined || user === null) return;
+
+        const likesFilteredToUser = previousLikedPosts?.filter(
+          (post) => post.userId === user.id
+        );
+
+        console.log("likesFilteredToUser: ", likesFilteredToUser);
+
+        const indexOfLikeToDelete = likesFilteredToUser?.findIndex(
+          (post) => post.postId === likedPostId.postId
+        );
+
+        console.log("indexOfLikeToDelete", indexOfLikeToDelete);
+
+        if (indexOfLikeToDelete === undefined) return;
+
+        // Optimistically update to the new value
+        ctx.posts.getLikedPosts.setData(undefined, (old) => {
+          if (old === undefined) {
+            throw new Error("Old data is undefined. This should never happen!");
+          } else {
+            const oldCopy = [...old];
+            oldCopy?.splice(indexOfLikeToDelete, 1);
+            console.log("oldCopy is: ", oldCopy);
+            return oldCopy;
+          }
+        });
+
+        // Return a context object with the snapshotted value
+        return { previousLikedPosts };
+      },
       onSuccess: () => {
         void ctx.posts.getLikedPosts.invalidate();
       },
