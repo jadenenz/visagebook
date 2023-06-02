@@ -13,8 +13,6 @@ const UserView = (props: user) => {
   const ctx = api.useContext();
   const user = useUser().user;
 
-  if (id === user?.id) return null;
-
   const { data, isLoading } = api.relations.getAll.useQuery();
   const mutation = api.relations.requestById.useMutation({
     onSuccess: () => {
@@ -31,6 +29,8 @@ const UserView = (props: user) => {
   });
   console.log("data is: ", data);
   console.log("userID is : ", user?.id);
+
+  if (id === user?.id) return null;
 
   if (!data) return null;
 
@@ -54,7 +54,7 @@ const UserView = (props: user) => {
     (relation) => relation.relatedUser === id && relation.type === "pending"
   );
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-start">
       <Image
         className="mx-4 my-2 rounded-full"
         alt={`${fullName}'s profile`}
@@ -64,7 +64,7 @@ const UserView = (props: user) => {
       />
       <div className="mx-2">{fullName}</div>
       {userIsFriendsWith.length > 0 && (
-        <div className="text-sm">Already friends!</div>
+        <div className="text-sm text-blue-500">Already friends!</div>
       )}
       {userIsFriendsWith.length === 0 &&
         userSentPendingRequest.length === 0 && (
@@ -89,9 +89,9 @@ export const UsersList = () => {
   });
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-start">
       <div>Users List</div>
-      <div>{mappedUsers}</div>
+      <div className="items-start">{mappedUsers}</div>
     </div>
   );
 };

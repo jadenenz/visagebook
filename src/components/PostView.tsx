@@ -14,7 +14,7 @@ const CommentView = (props: PostWithUser) => {
     if (comment.content === undefined) return null;
 
     return (
-      <div className="flex items-center justify-center" key={comment.id}>
+      <div className="flex items-center justify-start" key={comment.id}>
         <div>
           <Image
             src={comment.commentAuthorData.profileImageUrl}
