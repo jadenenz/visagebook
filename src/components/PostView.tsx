@@ -139,8 +139,9 @@ export const PostView = (props: PostWithUser) => {
 
         console.log("likesFilteredToUser: ", likesFilteredToUser);
 
-        const indexOfLikeToDelete = likesFilteredToUser?.findIndex(
-          (post) => post.postId === likedPostId.postId
+        const indexOfLikeToDelete = previousLikedPosts?.findIndex(
+          (post) =>
+            post.userId === user.id && post.postId === likedPostId.postId
         );
 
         console.log("indexOfLikeToDelete", indexOfLikeToDelete);
