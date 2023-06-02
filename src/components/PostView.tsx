@@ -3,10 +3,15 @@ import { type Post } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { getQueryKey } from "@trpc/react-query";
 import Image from "next/image";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { useId, useState } from "react";
 import { type RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
 import { HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
+
+dayjs().format();
+dayjs.extend(relativeTime);
 
 const CommentView = (props: PostWithUser) => {
   const { post } = props;
@@ -195,7 +200,9 @@ export const PostView = (props: PostWithUser) => {
         <div className="flex flex-col">
           <div>
             <div>{author.fullName}</div>
-            <div className="text-sm text-gray-700">3d ago</div>
+            <div className="text-sm text-gray-700">
+              {dayjs(post.createdAt).fromNow(true)} ago
+            </div>
           </div>
         </div>
       </div>

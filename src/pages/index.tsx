@@ -179,23 +179,25 @@ const Home: NextPage = () => {
       </Head>
       <div className="grid h-full w-full grid-cols-3">
         <div>menu buttons go here</div>
+        {!isSignedIn && (
+          <div className="flex flex-col content-center items-center justify-center">
+            <h1 className="m-8 text-2xl">Not authenticated</h1>
+            <SignIn />
+          </div>
+        )}
         <main>
-          {!isSignedIn && (
-            <div className="flex flex-col content-center items-center justify-center">
-              <h1 className="m-8 text-2xl">Not authenticated</h1>
-              <SignIn />
-            </div>
-          )}
           {isSignedIn && (
             <div className="flex flex-col content-center items-center justify-center">
-              <FriendRequestWindow />
               <CreatePostWizard />
               <Feed />
               <SignOutButton />
             </div>
           )}
         </main>
-        <UsersList />
+        <div>
+          <UsersList />
+          <FriendRequestWindow />
+        </div>
       </div>
     </>
   );
