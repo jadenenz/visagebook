@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useId, useState } from "react";
 import { type RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
+import { HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
 
 const CommentView = (props: PostWithUser) => {
   const { post } = props;
@@ -50,6 +51,10 @@ export const PostView = (props: PostWithUser) => {
     (like) => like.postId === post.id
   );
 
+  const listOfLikesOnPost = likedPosts?.filter(
+    (like) => like.postId === post.id
+  );
+
   //mutation for posting comments
   const { mutate: mutateComment, isLoading: isPosting } =
     api.posts.postComment.useMutation({
@@ -79,6 +84,7 @@ export const PostView = (props: PostWithUser) => {
         if (user === undefined || user === null) return;
 
         const newLike = {
+          //mock id to fit the object shape
           id: "banana",
           postId: newLikePostId.postId,
           userId: user.id,
@@ -194,6 +200,10 @@ export const PostView = (props: PostWithUser) => {
         </div>
       </div>
       <div className="">{post.content}</div>
+      <div className="mt-4 flex place-items-center">
+        <HandThumbUpIcon className="mr-2 h-5 w-5 text-blue-500" />
+        <div>{listOfLikesOnPost?.length}</div>
+      </div>
       <div className="flex w-full flex-col">
         <div className="divider"></div>
         <div className="flex justify-between">
@@ -212,7 +222,9 @@ export const PostView = (props: PostWithUser) => {
               <button
                 onClick={() => mutateLike({ postId: post.id })}
                 className="btn-outline btn px-16"
+                disabled={isUnliking}
               >
+                <HandThumbUpIcon className="mr-2 h-5 w-5 " />
                 Like
               </button>
             )}
@@ -222,8 +234,10 @@ export const PostView = (props: PostWithUser) => {
             likedPostsThatMatchId.length > 0 && (
               <button
                 onClick={() => mutateUnlike({ postId: post.id })}
-                className="btn-outline btn px-16 text-red-300"
+                className="btn-outline btn px-16 text-blue-500"
+                disabled={isLiking}
               >
+                <HandThumbUpIcon className="mr-2 h-5 w-5 text-blue-500" />
                 Liked
               </button>
             )}
@@ -231,6 +245,7 @@ export const PostView = (props: PostWithUser) => {
             onClick={() => setShowCommentInput(true)}
             className="btn-outline btn px-16"
           >
+            <ChatBubbleLeftIcon className="mr-2 h-5 w-5" />
             Comment
           </button>
         </div>

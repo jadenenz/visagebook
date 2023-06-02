@@ -89,8 +89,8 @@ export const UsersList = () => {
   });
 
   return (
-    <div>
-      <h1>Users List</h1>
+    <div className="flex flex-col items-center">
+      <div>Users List</div>
       <div>{mappedUsers}</div>
     </div>
   );
