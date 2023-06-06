@@ -47,7 +47,7 @@ export const PostView = (props: PostWithUser) => {
   const [input, setInput] = useState("");
   const ctx = api.useContext();
   const { data: likedPosts } = api.posts.getLikedPosts.useQuery();
-  const likedPostsQueryKey = getQueryKey(api.posts.getLikedPosts);
+  // const likedPostsQueryKey = getQueryKey(api.posts.getLikedPosts);
 
   const postsThatUserHasLiked = likedPosts?.filter(
     (like) => like.userId === user?.id
@@ -222,14 +222,14 @@ export const PostView = (props: PostWithUser) => {
               // (isLiking ? (
               //   <button
               //     onClick={() => mutateUnlike({ postId: post.id })}
-              //     className="btn-outline btn px-16 text-red-300"
+              //     className="btn-ghost btn px-16 text-red-300"
               //   >
               //     Liked
               //   </button>
               // ) :
               <button
                 onClick={() => mutateLike({ postId: post.id })}
-                className="btn-outline btn px-16"
+                className="btn-ghost btn px-16"
                 disabled={isUnliking}
               >
                 <HandThumbUpIcon className="mr-2 h-5 w-5 " />
@@ -242,7 +242,7 @@ export const PostView = (props: PostWithUser) => {
             likedPostsThatMatchId.length > 0 && (
               <button
                 onClick={() => mutateUnlike({ postId: post.id })}
-                className="btn-outline btn px-16 text-blue-500"
+                className="btn-ghost btn px-16 text-blue-500"
                 disabled={isLiking}
               >
                 <HandThumbUpIcon className="mr-2 h-5 w-5 text-blue-500" />
@@ -251,7 +251,7 @@ export const PostView = (props: PostWithUser) => {
             )}
           <button
             onClick={() => setShowCommentInput(true)}
-            className="btn-outline btn px-16"
+            className="btn-ghost btn px-16"
           >
             <ChatBubbleLeftIcon className="mr-2 h-5 w-5" />
             Comment

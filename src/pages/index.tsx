@@ -8,6 +8,7 @@ import Image from "next/image";
 import { PostView } from "~/components/PostView";
 import { useState } from "react";
 import { UsersList } from "~/components/UsersList";
+import { Menu } from "~/components/Menu";
 
 type RelatingUser = {
   id: string;
@@ -85,7 +86,7 @@ const FriendRequestWindow = () => {
   if (!user) return null;
 
   return (
-    <div className="border">
+    <div className="max-h-52 w-full border bg-white p-4 shadow-md">
       <h1>Your friend requests: </h1>
       <br />
       <div>{friendRequests}</div>
@@ -115,7 +116,7 @@ const CreatePostWizard = () => {
   if (!user) return null;
 
   return (
-    <div className="mb-14 flex max-w-2xl items-center justify-center gap-3 bg-white p-4">
+    <div className="mb-14 flex w-full items-center justify-center gap-3 rounded bg-white p-4 shadow-md">
       <Image
         src={user.profileImageUrl}
         alt="profile"
@@ -156,7 +157,7 @@ const Feed = () => {
   if (!postData) return <div>Something went wrong</div>;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex w-full flex-col">
       {postData?.map((fullPost) => (
         <PostView {...fullPost} key={fullPost.post.id} />
       ))}
@@ -178,7 +179,10 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="grid h-full w-full grid-cols-3">
-        <div>menu buttons go here</div>
+        <div className="flex">
+          <Menu />
+          <FriendRequestWindow />
+        </div>
         {!isSignedIn && (
           <div className="flex flex-col content-center items-center justify-center">
             <h1 className="m-8 text-2xl">Not authenticated</h1>
@@ -194,9 +198,8 @@ const Home: NextPage = () => {
             </div>
           )}
         </main>
-        <div>
+        <div className="flex justify-center">
           <UsersList />
-          <FriendRequestWindow />
         </div>
       </div>
     </>
