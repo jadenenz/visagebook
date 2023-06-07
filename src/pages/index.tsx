@@ -4,7 +4,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { api } from "~/utils/api";
 import Image from "next/image";
-
 import { PostView } from "~/components/PostView";
 import { useState } from "react";
 import { UsersList } from "~/components/UsersList";
@@ -166,10 +165,11 @@ const Feed = () => {
 };
 
 const Home: NextPage = () => {
-  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   const { isSignedIn, user } = useUser();
   console.log(user);
+
+  const [showFriendRequestWindow, setShowFriendResquestWindow] =
+    useState(false);
 
   return (
     <>
@@ -180,8 +180,11 @@ const Home: NextPage = () => {
       </Head>
       <div className="grid h-full w-full grid-cols-3">
         <div className="flex">
-          <Menu />
-          <FriendRequestWindow />
+          <Menu
+            currentState={showFriendRequestWindow}
+            setState={setShowFriendResquestWindow}
+          />
+          {showFriendRequestWindow && <FriendRequestWindow />}
         </div>
         {!isSignedIn && (
           <div className="flex flex-col content-center items-center justify-center">
