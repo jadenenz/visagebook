@@ -8,6 +8,7 @@ import { PostView } from "~/components/PostView";
 import { useState } from "react";
 import { UsersList } from "~/components/UsersList";
 import { Menu } from "~/components/Menu";
+import { ProfileSubmenu } from "~/components/ProfileSubmenu";
 
 type RelatingUser = {
   id: string;
@@ -85,7 +86,7 @@ const FriendRequestWindow = () => {
   if (!user) return null;
 
   return (
-    <div className="max-h-52 w-full border bg-white p-4 shadow-md">
+    <div className="m-3 max-h-52 w-2/5 bg-white p-4 shadow-md">
       <h1>Your friend requests: </h1>
       <br />
       <div>{friendRequests}</div>
@@ -171,6 +172,8 @@ const Home: NextPage = () => {
   const [showFriendRequestWindow, setShowFriendResquestWindow] =
     useState(false);
 
+  const [showProfileSubmenu, setShowProfileSubmenu] = useState(false);
+
   return (
     <>
       <Head>
@@ -181,10 +184,13 @@ const Home: NextPage = () => {
       <div className="grid h-full w-full grid-cols-3">
         <div className="flex">
           <Menu
-            currentState={showFriendRequestWindow}
-            setState={setShowFriendResquestWindow}
+            currentFriendState={showFriendRequestWindow}
+            setFriendState={setShowFriendResquestWindow}
+            currentProfileState={showProfileSubmenu}
+            setProfileState={setShowProfileSubmenu}
           />
           {showFriendRequestWindow && <FriendRequestWindow />}
+          {showProfileSubmenu && <ProfileSubmenu />}
         </div>
         {!isSignedIn && (
           <div className="flex flex-col content-center items-center justify-center">

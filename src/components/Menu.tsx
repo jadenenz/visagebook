@@ -19,19 +19,36 @@ const MenuItem = (props: MenuItemProps) => {
 };
 
 type childrenProps = {
-  setState: Dispatch<SetStateAction<boolean>>;
-  currentState: boolean;
+  setFriendState: Dispatch<SetStateAction<boolean>>;
+  currentFriendState: boolean;
+  setProfileState: Dispatch<SetStateAction<boolean>>;
+  currentProfileState: boolean;
 };
 export const Menu = (props: childrenProps) => {
-  const { setState, currentState } = props;
+  const {
+    setFriendState,
+    currentFriendState,
+    setProfileState,
+    currentProfileState,
+  } = props;
   const user = useUser();
 
   const ToggleFriendRequestDisplay = () => {
-    if (currentState === false) {
-      setState(true);
-    } else if (currentState === true) {
-      setState(false);
+    if (!currentFriendState) {
+      setFriendState(true);
+    } else if (currentFriendState) {
+      setFriendState(false);
     }
+    setProfileState(false);
+  };
+
+  const toggleProfileSubmenu = () => {
+    if (currentProfileState) {
+      setProfileState(false);
+    } else if (!currentProfileState) {
+      setProfileState(true);
+    }
+    setFriendState(false);
   };
 
   if (!user.user) return null;
@@ -39,7 +56,10 @@ export const Menu = (props: childrenProps) => {
   return (
     <div>
       <ol className="flex flex-col">
-        <button className="btn-ghost btn-wide btn justify-start">
+        <button
+          className="btn-ghost btn-wide btn justify-start"
+          onClick={toggleProfileSubmenu}
+        >
           <Image
             src={user.user.profileImageUrl}
             alt="user profile"

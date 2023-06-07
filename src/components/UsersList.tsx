@@ -1,5 +1,6 @@
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 import { api } from "~/utils/api";
 
 type user = {
@@ -54,16 +55,17 @@ const UserView = (props: user) => {
     (relation) => relation.relatedUser === id && relation.type === "pending"
   );
   return (
-    <div className="flex items-center justify-start">
-      <Image
-        className="mx-4 my-2 rounded-full"
-        alt={`${fullName}'s profile`}
-        src={profileImageUrl}
-        height={36}
-        width={36}
-      />
-      <div className="mx-2">{fullName}</div>
-      {userIsFriendsWith.length > 0 && (
+    <Link href={`/profile/${id}`} className="btn-ghost btn">
+      <div className="flex items-center justify-start">
+        <Image
+          className="mx-4 my-2 rounded-full"
+          alt={`${fullName}'s profile`}
+          src={profileImageUrl}
+          height={36}
+          width={36}
+        />
+        <div className="mx-2">{fullName}</div>
+        {/* {userIsFriendsWith.length > 0 && (
         <div className="text-sm text-blue-500">Already friends!</div>
       )}
       {userIsFriendsWith.length === 0 &&
@@ -72,8 +74,9 @@ const UserView = (props: user) => {
             Friend Request
           </button>
         )}
-      {userSentPendingRequest.length > 0 && <div>Friend request pending</div>}
-    </div>
+      {userSentPendingRequest.length > 0 && <div>Friend request pending</div>} */}
+      </div>
+    </Link>
   );
 };
 
@@ -91,7 +94,7 @@ export const UsersList = () => {
   return (
     <div className="flex flex-col items-start">
       <div>Users List</div>
-      <div className="items-start">{mappedUsers}</div>
+      <div className="flex flex-col items-start">{mappedUsers}</div>
     </div>
   );
 };
