@@ -27,4 +27,15 @@ export const userRouter = createTRPCRouter({
     );
     return users;
   }),
+
+  getById: publicProcedure
+    .input(
+      z.object({
+        content: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const user = await clerkClient.users.getUser(input.content);
+      return filterUserForClient(user);
+    }),
 });

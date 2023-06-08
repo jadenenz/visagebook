@@ -39,6 +39,15 @@ const CommentView = (props: PostWithUser) => {
 };
 
 type PostWithUser = RouterOutputs["posts"]["getAll"][number];
+type JustAPost = {
+  key: string;
+  id: string;
+  createdAt: Date;
+  content: string;
+  authorId: string;
+};
+
+type OneOrTheOther = PostWithUser | JustAPost;
 
 export const PostView = (props: PostWithUser) => {
   const { post, author } = props;
@@ -52,13 +61,13 @@ export const PostView = (props: PostWithUser) => {
   const postsThatUserHasLiked = likedPosts?.filter(
     (like) => like.userId === user?.id
   );
-  const likedPostsThatMatchId = postsThatUserHasLiked?.filter(
-    (like) => like.postId === post.id
-  );
+  const likedPostsThatMatchId = postsThatUserHasLiked?.filter((like) => {
+    if (post) return like.postId === post.id;
+  });
 
-  const listOfLikesOnPost = likedPosts?.filter(
-    (like) => like.postId === post.id
-  );
+  const listOfLikesOnPost = likedPosts?.filter((like) => {
+    if (post) return like.postId === post.id;
+  });
 
   //mutation for posting comments
   const { mutate: mutateComment, isLoading: isPosting } =

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 
 export const ProfileSubmenu = () => {
   const user = useUser();
+  const { signOut } = useClerk();
 
   if (!user.user) return null;
 
@@ -11,7 +13,9 @@ export const ProfileSubmenu = () => {
       <Link href={`/profile/${user.user?.id}`} className="btn-ghost btn">
         Profile
       </Link>
-      <button className="btn-ghost btn">Sign out</button>
+      <button className="btn-ghost btn" onClick={() => signOut()}>
+        Sign out
+      </button>
     </div>
   );
 };
