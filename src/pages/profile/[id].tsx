@@ -41,17 +41,19 @@ const UserProfilePage: NextPage = () => {
 
   return (
     <div>
-      <div className="mb-8 flex min-w-full flex-col items-center border bg-white px-20">
+      <div className="mb-8 flex min-w-full flex-col items-center border bg-white lg:px-20">
         <div className="h-72 w-full max-w-7xl justify-center rounded bg-gray-200"></div>
-        <div className="flex w-full max-w-7xl shadow-md">
-          <Image
-            className="rounded-full"
-            src={data.profileImageUrl}
-            alt={`${data.fullName}'s profile`}
-            height={98}
-            width={98}
-          />
-          <div className="text-4xl font-bold">{data.fullName}</div>
+        <div className="relative flex w-full max-w-7xl p-2 shadow-md">
+          <div className="absolute bottom-1 ml-6 flex h-28 w-28 items-center justify-center rounded-full bg-white">
+            <Image
+              className="rounded-full"
+              src={data.profileImageUrl}
+              alt={`${data.fullName}'s profile`}
+              height={98}
+              width={98}
+            />
+          </div>
+          <div className="ml-36 text-4xl font-bold">{data.fullName}</div>
         </div>
       </div>
       <div className=" flex flex-col content-center items-center justify-center">
