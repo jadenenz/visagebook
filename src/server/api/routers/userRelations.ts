@@ -107,6 +107,40 @@ export const userRelationsRouter = createTRPCRouter({
       if (!newFriend) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
     }),
 
+  unfriendById: privateProcedure
+    .input(
+      z.object({
+        relatedUserId: string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const deletedRelation = await ctx.prisma.user_Relationship.delete({
+        where: {
+          relatingUser_relatedUser: {
+            relatingUser: ctx.userId,
+            relatedUser: input.relatedUserId,
+          },
+        },
+      });
+      const deletedRelation2 = await ctx.prisma.user_Relationship.delete({
+        where: {
+          relatingUser_relatedUser: {
+            relatingUser: input.relatedUserId,
+            relatedUser: ctx.userId,
+          },
+        },
+      });
+
+      if (!deletedRelation)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      if (!deletedRelation2)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+        });
+    }),
+
   getAll: publicProcedure.query(async ({ ctx }) => {
     const relations = await ctx.prisma.user_Relationship.findMany({
       take: 100,

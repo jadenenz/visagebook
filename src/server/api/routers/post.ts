@@ -27,19 +27,17 @@ interface CommentWithUserData extends Comment {
 type PostWithComments = Post & { comments: Comment[] };
 type PostWithCommentsAndUserData = Post & { comments: CommentWithUserData[] };
 const addUserDataToPosts = async (posts: PostWithComments[]) => {
-  const users = // await clerkClient.users.getUserList({
-  //   userId: posts.map((post) => post.authorId),
-  //   limit: 100,
-  // })
-  (await clerkClient.users.getUserList()).map(filterUserForClient);
+  const users =
+    // await clerkClient.users.getUserList({   ------- This didn't work
+    //   userId: posts.map((post) => post.authorId),
+    //   limit: 100,
+    // })
+    (await clerkClient.users.getUserList()).map(filterUserForClient);
 
   return posts.map((post) => {
     const author = users.find((user) => user.id === post.authorId);
     const newComments = post.comments.map((comment) => {
-      // console.log("comment author is: ", comment.authorId);
       const commentAuthor = users.find((user) => user.id === comment.authorId);
-      console.log("users is: ", users);
-      console.log("Commentauthor is: ", commentAuthor);
       if (!commentAuthor)
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

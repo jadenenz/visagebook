@@ -15,19 +15,19 @@ const UserView = (props: user) => {
   const user = useUser().user;
 
   const { data, isLoading } = api.relations.getAll.useQuery();
-  const mutation = api.relations.requestById.useMutation({
-    onSuccess: () => {
-      void ctx.relations.getAll.invalidate();
-    },
-    onError: (e) => {
-      const errorMessage = e.data?.zodError?.fieldErrors.content;
-      if (errorMessage && errorMessage[0]) {
-        console.log(errorMessage[0]);
-      } else {
-        console.log("Failed to update! Please try again later.");
-      }
-    },
-  });
+  // const mutation = api.relations.requestById.useMutation({
+  //   onSuccess: () => {
+  //     void ctx.relations.getAll.invalidate();
+  //   },
+  //   onError: (e) => {
+  //     const errorMessage = e.data?.zodError?.fieldErrors.content;
+  //     if (errorMessage && errorMessage[0]) {
+  //       console.log(errorMessage[0]);
+  //     } else {
+  //       console.log("Failed to update! Please try again later.");
+  //     }
+  //   },
+  // });
   console.log("data is: ", data);
   console.log("userID is : ", user?.id);
 
@@ -37,23 +37,21 @@ const UserView = (props: user) => {
 
   if (isLoading) return <div>Loading...</div>;
 
-  const handleFriendRequest = () => {
-    mutation.mutate({ relatedUserId: id });
-  };
+  // const handleFriendRequest = () => {
+  //   mutation.mutate({ relatedUserId: id });
+  // };
 
-  const relationsInvolvingUser = data?.filter(
-    (relation) => relation.relatingUser.id === user?.id
-  );
+  // const relationsInvolvingUser = data?.filter(
+  //   (relation) => relation.relatingUser.id === user?.id
+  // );
 
-  console.log("relationsInvolvingUser: ", relationsInvolvingUser);
+  // const userIsFriendsWith = relationsInvolvingUser?.filter(
+  //   (relation) => relation.relatedUser === id && relation.type === "friend"
+  // );
 
-  const userIsFriendsWith = relationsInvolvingUser?.filter(
-    (relation) => relation.relatedUser === id && relation.type === "friend"
-  );
-
-  const userSentPendingRequest = relationsInvolvingUser?.filter(
-    (relation) => relation.relatedUser === id && relation.type === "pending"
-  );
+  // const userSentPendingRequest = relationsInvolvingUser?.filter(
+  //   (relation) => relation.relatedUser === id && relation.type === "pending"
+  // );
   return (
     <Link href={`/profile/${id}`} className="btn-ghost btn">
       <div className="flex items-center justify-start">
