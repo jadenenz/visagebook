@@ -4,6 +4,7 @@ import { PostView } from "~/components/PostView";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import Navbar from "~/components/Navbar";
 
 const ProfileFeed = () => {
   const router = useRouter();
@@ -18,7 +19,8 @@ const ProfileFeed = () => {
   //     (post) => post.author.id === router.query.id
   //   );
 
-  if (postsLoading) return <div>Loading...</div>;
+  if (postsLoading)
+    return <span className="loading-spinner loading-lg loading"></span>;
   if (!postData) return <div>Something went wrong</div>;
 
   return (
@@ -29,6 +31,7 @@ const ProfileFeed = () => {
       {postData.length === 0 && (
         <div className="text-bold text-6xl">
           This user hasn&apos;t posted anything yet...
+          <span className="loading-ring loading-lg loading"></span>
         </div>
       )}
     </div>
@@ -100,10 +103,12 @@ const UserProfilePage: NextPage = () => {
   if (userIsFriendsWith === undefined) return null;
   if (userSentPendingRequest === undefined) return null;
   if (!data) return null;
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return <span className="loading-spinner loading-lg loading"></span>;
 
   return (
     <div className="min-h-screen">
+      <Navbar />
       <div className="mb-8 flex min-w-full flex-col items-center bg-white shadow-md lg:px-20">
         <div className="h-72 w-full max-w-7xl justify-center rounded bg-gray-200"></div>
         <div className="relative flex w-full max-w-7xl justify-between p-2 pb-4 shadow-md">
@@ -168,7 +173,7 @@ const UserProfilePage: NextPage = () => {
                 Unfriend
               </button>
             )}
-            <button className="btn-ghost btn">
+            <button className="btn-ghost btn ml-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
