@@ -198,7 +198,7 @@ const Home: NextPage = () => {
         </div>
         {!isSignedIn && (
           <div className="flex h-screen flex-col content-center items-center justify-center">
-            <span className="loading-spinner loading-lg loading"></span>
+            {/* <span className="loading-spinner loading-lg loading"></span> */}
             <SignIn />
           </div>
         )}
