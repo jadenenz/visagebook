@@ -31,7 +31,6 @@ const ProfileFeed = () => {
       {postData.length === 0 && (
         <div className="text-bold text-6xl">
           This user hasn&apos;t posted anything yet...
-          <span className="loading-ring loading-lg loading"></span>
         </div>
       )}
     </div>
