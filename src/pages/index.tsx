@@ -69,7 +69,7 @@ const FriendRequestWindow = () => {
   if (!data) return null;
 
   if (isLoading)
-    return <span className="loading-spinner loading-lg loading"></span>;
+    return <span className="loading loading-spinner loading-lg"></span>;
 
   const friendRequests = data?.map((request) => {
     if (request.relatedUser === user?.id) {
@@ -156,7 +156,7 @@ const Feed = () => {
   console.log("post query data: ", postData);
 
   if (postsLoading)
-    return <span className="loading-spinner loading-lg loading"></span>;
+    return <span className="loading loading-spinner loading-lg"></span>;
   if (!postData) return <div>Something went wrong</div>;
 
   return (
@@ -185,8 +185,8 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Navbar />
-      <div className="mt-16 grid h-full w-full grid-cols-3">
-        <div className="flex">
+      <div className="mt-16 grid h-full w-full lg:grid-cols-3">
+        <div className="hidden lg:flex">
           <Menu
             currentFriendState={showFriendRequestWindow}
             setFriendState={setShowFriendResquestWindow}
@@ -197,7 +197,7 @@ const Home: NextPage = () => {
           {showProfileSubmenu && <ProfileSubmenu />}
         </div>
         {!isSignedIn && (
-          <div className="flex h-screen flex-col content-center items-center justify-center">
+          <div className=" h-screen flex-col content-center items-center justify-center ">
             {/* <span className="loading-spinner loading-lg loading"></span> */}
             <SignIn />
           </div>
@@ -210,7 +210,7 @@ const Home: NextPage = () => {
             </div>
           )}
         </main>
-        <div className="flex justify-center">
+        <div className="hidden  justify-center lg:flex">
           <UsersList />
         </div>
       </div>

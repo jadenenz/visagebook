@@ -9,6 +9,7 @@ import { useId, useState } from "react";
 import { type RouterOutputs } from "~/utils/api";
 import { api } from "~/utils/api";
 import { HandThumbUpIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/solid";
+import Link from "next/link";
 
 dayjs().format();
 dayjs.extend(relativeTime);
@@ -199,14 +200,15 @@ export const PostView = (props: PostWithUser) => {
       className="mb-8 flex min-w-full flex-col rounded bg-white p-2 shadow-md"
     >
       <div className="flex items-center justify-center">
-        <Image
-          src={author.profileImageUrl}
-          alt={`${author.fullName}'s profile`}
-          className="m-4 rounded-full"
-          height={46}
-          width={46}
-        />
-
+        <Link href={`/profile/${post.authorId}`}>
+          <Image
+            src={author.profileImageUrl}
+            alt={`${author.fullName}'s profile`}
+            className="m-4 rounded-full"
+            height={46}
+            width={46}
+          />
+        </Link>
         <div className="flex flex-col">
           <div>
             <div>{author.fullName}</div>
