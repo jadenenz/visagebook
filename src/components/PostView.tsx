@@ -21,7 +21,7 @@ const CommentView = (props: PostWithUser) => {
 
     return (
       <div className="flex items-center justify-start" key={comment.id}>
-        <div>
+        <Link href={`/profile/${comment.authorId}`}>
           <Image
             src={comment.commentAuthorData.profileImageUrl}
             alt={`${comment.commentAuthorData.fullName}'s profile`}
@@ -29,9 +29,17 @@ const CommentView = (props: PostWithUser) => {
             height={46}
             width={46}
           />
+        </Link>
+        <div className="grid grid-rows-2">
+          <div className="flex items-start">
+            <div className="text-sm">{comment.commentAuthorData.fullName}</div>
+            <div className="ml-2 text-sm text-gray-700">
+              {" "}
+              {dayjs(comment.createdAt).fromNow(true)} ago
+            </div>
+          </div>
+          <div>{comment.content}</div>
         </div>
-        <div className="mx-2">{comment.commentAuthorData.fullName}</div>
-        <div>{comment.content}</div>
       </div>
     );
   });
@@ -269,7 +277,7 @@ export const PostView = (props: PostWithUser) => {
           </button>
         </div>
         {showCommentInput && (
-          <div>
+          <div className="flex">
             <input
               placeholder="Add a comment..."
               className="grow bg-transparent outline-none"
@@ -288,8 +296,17 @@ export const PostView = (props: PostWithUser) => {
               }}
               disabled={isPosting}
             />
-            <button onClick={() => setShowCommentInput(false)}>Cancel</button>
-            <button onClick={handleSubmitComment}>Submit</button>
+            <div className="items-end">
+              <button
+                className="btn-sm btn m-2"
+                onClick={() => setShowCommentInput(false)}
+              >
+                Cancel
+              </button>
+              <button className="btn-sm btn" onClick={handleSubmitComment}>
+                Submit
+              </button>
+            </div>
           </div>
         )}
         <div className="divider"></div>
