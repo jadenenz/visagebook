@@ -207,7 +207,7 @@ export const PostView = (props: PostWithUser) => {
       key={post.id}
       className="mb-8 flex min-w-full flex-col rounded bg-white p-2 shadow-md"
     >
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-start">
         <Link href={`/profile/${post.authorId}`}>
           <Image
             src={author.profileImageUrl}
@@ -226,10 +226,12 @@ export const PostView = (props: PostWithUser) => {
           </div>
         </div>
       </div>
-      <div className="">{post.content}</div>
-      <div className="mt-4 flex place-items-center">
-        <HandThumbUpIcon className="mr-2 h-5 w-5 text-blue-500" />
-        <div>{listOfLikesOnPost?.length}</div>
+      <div className="pl-4">
+        <div className="">{post.content}</div>
+        <div className="mt-4 flex place-items-center">
+          <HandThumbUpIcon className="mr-2 h-5 w-5 text-blue-500" />
+          <div>{listOfLikesOnPost?.length}</div>
+        </div>
       </div>
       <div className="flex w-full flex-col">
         <div className="divider"></div>
