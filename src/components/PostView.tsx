@@ -240,7 +240,7 @@ export const PostView = (props: PostWithUser) => {
               // ) :
               <button
                 onClick={() => mutateLike({ postId: post.id })}
-                className="btn-ghost btn px-16"
+                className="btn-ghost btn"
                 disabled={isUnliking}
               >
                 <HandThumbUpIcon className="mr-2 h-5 w-5 " />
@@ -253,7 +253,7 @@ export const PostView = (props: PostWithUser) => {
             likedPostsThatMatchId.length > 0 && (
               <button
                 onClick={() => mutateUnlike({ postId: post.id })}
-                className="btn-ghost btn px-16 text-blue-500"
+                className="btn-ghost btn-md btn text-blue-500"
                 disabled={isLiking}
               >
                 <HandThumbUpIcon className="mr-2 h-5 w-5 text-blue-500" />
@@ -262,7 +262,7 @@ export const PostView = (props: PostWithUser) => {
             )}
           <button
             onClick={() => setShowCommentInput(true)}
-            className="btn-ghost btn px-16"
+            className="btn-ghost btn-md btn "
           >
             <ChatBubbleLeftIcon className="mr-2 h-5 w-5" />
             Comment
